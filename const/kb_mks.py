@@ -9,6 +9,10 @@ class KeyboardMK:
         )
 
     @staticmethod
+    def get_logs_btn(alias: str, button_name: str = None) -> InlineKeyboardButton:
+        return InlineKeyboardButton(f"{button_name or alias}", callback_data=f"logs_{alias}")
+
+    @staticmethod
     def repo() -> InlineKeyboardMarkup:
         return InlineKeyboardMarkup(
             [

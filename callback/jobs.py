@@ -1,8 +1,10 @@
+import asyncio
 from html import escape
 import logging
 
+from telegram import BotCommand, BotCommandScopeAllPrivateChats
 from telegram.ext import CallbackContext
-from telegram.error import Unauthorized, BadRequest
+from telegram.error import BadRequest, Forbidden
 
 from common import get_list_of_py
 from const import CONFIG
@@ -12,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class Jobs:
     @staticmethod
-    def supervisor(context: CallbackContext):
+    async def supervisor(context: CallbackContext):
         if "prev_bot_list" not in context.bot_data:
             # load list of running bots for the first time
             context.bot_data["prev_bot_list"] = {
@@ -45,7 +47,35 @@ class Jobs:
                 )
                 for admin in CONFIG.ADMINS:
                     try:
-                        context.bot.send_message(chat_id=admin, text=to_send, parse_mode="HTML")
-                    except (Unauthorized, BadRequest): pass
+                        await context.bot.send_message(chat_id=admin, text=to_send, parse_mode="HTML")
+                    except (Forbidden, BadRequest): pass
                     except Exception as e:
                         logger.exception(f"{e}")
+
+    @staticmethod
+    async def set_commands( context: CallbackContext ):
+        commands = [BotCommand("start", "start the bot"),
+			BotCommand("restart", "restart a bot/script using alias"),
+			BotCommand("logs", "get logs of a bot/script"),
+			BotCommand("get", "get all running py processes"),
+			BotCommand("stats", "stats of the server"),
+			BotCommand("detail_stats", "stats of the processes"),
+			BotCommand("help", "help message")]
+        # for command in commands:
+        retries = 5
+        while retries > 0:
+            try:
+                await context.bot.set_my_commands(
+                    commands,
+                    language_code="en",
+                    scope=BotCommandScopeAllPrivateChats()
+                    )
+            except Exception as e:
+                retries -= 1
+                await asyncio.sleep(3 * retries)
+                if retries < 0:
+                    raise e
+                else:
+                    break
+            else:
+                break
