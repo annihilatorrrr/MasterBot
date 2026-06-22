@@ -8,15 +8,27 @@ from callback import Jobs
 from const.CONFIG import CONFIG
 from handlers import Handlers
 
-logging.basicConfig(handlers=[RotatingFileHandler("./logs.log", maxBytes=10000, backupCount=4)],
-                    level=logging.INFO,
-                    format="[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s",
-                    datefmt="%Y-%m-%dT%H:%M:%S", )
+logging.basicConfig(handlers=[
+		RotatingFileHandler("./logs.log", maxBytes=1000000, backupCount=4),
+		logging.StreamHandler()
+	],
+	level=logging.INFO,
+	format="[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s",
+	datefmt="%Y-%m-%dT%H:%M:%S", )
 
 logger = logging.getLogger(__name__)
 
 aps_logger = logging.getLogger('apscheduler')
 aps_logger.setLevel(logging.ERROR)
+
+httpx_logger = logging.getLogger('httpx')
+httpx_logger.setLevel(logging.ERROR)
+
+httpcore_logger = logging.getLogger('httpcore')
+httpcore_logger.setLevel(logging.ERROR)
+
+telegram_logger = logging.getLogger('telegram')
+telegram_logger.setLevel(logging.ERROR)
 
 
 def main():
