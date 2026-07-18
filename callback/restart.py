@@ -22,7 +22,7 @@ class Restart:
 
 		process = get_full_info(alias)
 		status_msg = await update.effective_message.reply_html(
-			f"Trying to restart the process {alias}...", quote=False
+			f"Trying to restart the process {alias}...", do_quote=False
 			)
 		if process:
 			path = process.cwd()
@@ -71,4 +71,4 @@ class Restart:
 					)
 		else:
 			await update.effective_message.reply_html(f"No process found under the alias {alias}",
-			                                    quote=False)
+			                                    do_quote=False)
